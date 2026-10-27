@@ -1,0 +1,7 @@
+interface:
+  display_name: "writing-workshop"
+  short_description: "多角色协作编写、审查并定稿任意类型的专业或非专业文档"
+  default_prompt: "使用 $writing-workshop 起草、审查并直接定稿任意类型的写作成果；每轮达到迭代上限仍有问题时，先展示剩余问题并由用户决定是否继续下一轮。"
+
+policy:
+  allow_implicit_invocation: true

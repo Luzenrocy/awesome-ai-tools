@@ -1,0 +1,30 @@
+{
+  "name": "awesome-ai-tools",
+  "owner": {
+    "name": "awesome-ai-tools maintainers"
+  },
+  "metadata": {
+    "description": "Reusable AI skills for writing and document workflows"
+  },
+  "plugins": [
+    {
+      "name": "awesome-ai-tools",
+      "source": "./",
+      "description": "Reusable writing and review skills",
+      "version": "0.1.0",
+      "author": {
+        "name": "awesome-ai-tools maintainers"
+      },
+      "repository": "https://github.com/Luzenrocy/awesome-ai-tools",
+      "license": "MIT",
+      "keywords": [
+        "skills",
+        "writing",
+        "review",
+        "documentation"
+      ],
+      "category": "productivity",
+      "strict": false
+    }
+  ]
+}

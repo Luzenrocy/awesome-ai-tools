@@ -1,0 +1,21 @@
+{
+  "name": "awesome-ai-tools",
+  "version": "0.1.0",
+  "description": "Reusable writing and document-review skills for Claude Code",
+  "author": {
+    "name": "awesome-ai-tools maintainers"
+  },
+  "homepage": "https://github.com/Luzenrocy/awesome-ai-tools",
+  "repository": "https://github.com/Luzenrocy/awesome-ai-tools",
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "skills",
+    "writing",
+    "review",
+    "documentation"
+  ],
+  "skills": [
+    "./skills/"
+  ]
+}
