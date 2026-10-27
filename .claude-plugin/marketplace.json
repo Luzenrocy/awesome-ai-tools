@@ -1,19 +1,19 @@
 {
   "name": "awesome-ai-tools",
   "owner": {
-    "name": "awesome-ai-tools maintainers"
+    "name": "Luzenrocy"
   },
   "metadata": {
-    "description": "Reusable AI skills for writing and document workflows"
+    "description": "好用的AI大模型工具集，包含但不限于agent、skill、mcp等。"
   },
   "plugins": [
     {
       "name": "awesome-ai-tools",
       "source": "./",
-      "description": "Reusable writing and review skills",
-      "version": "0.1.0",
+      "description": "好用的AI大模型工具集，包含但不限于agent、skill、mcp等。",
+      "version": "1.0.0",
       "author": {
-        "name": "awesome-ai-tools maintainers"
+        "name": "Luzenrocy"
       },
       "repository": "https://github.com/Luzenrocy/awesome-ai-tools",
       "license": "MIT",

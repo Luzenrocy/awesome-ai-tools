@@ -1,9 +1,9 @@
 {
   "name": "awesome-ai-tools",
-  "version": "0.1.0",
-  "description": "Reusable writing and document-review skills for Codex",
+  "version": "1.0.0",
+  "description": "好用的AI大模型工具集，包含但不限于agent、skill、mcp等。",
   "author": {
-    "name": "awesome-ai-tools maintainers"
+    "name": "Luzenrocy"
   },
   "homepage": "https://github.com/Luzenrocy/awesome-ai-tools",
   "repository": "https://github.com/Luzenrocy/awesome-ai-tools",
@@ -18,9 +18,9 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Awesome AI Tools",
-    "shortDescription": "Reusable writing and document-review skills",
-    "longDescription": "A small, installable collection of skills for drafting, reviewing, and publishing written artifacts.",
-    "developerName": "awesome-ai-tools maintainers",
+    "shortDescription": "好用的AI大模型工具集，包含但不限于agent、skill、mcp等。",
+    "longDescription": "好用的AI大模型工具集，包含但不限于agent、skill、mcp等。",
+    "developerName": "Luzenrocy",
     "category": "Productivity",
     "capabilities": [
       "Read",
