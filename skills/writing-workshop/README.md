@@ -113,6 +113,10 @@ writing-workshop/
 
 `prompt-packs/roles.yaml` 提供架构师、技术写作者、产品经理、产品设计师、业务分析师、内容编辑、短视频编剧、小说作者、发展编辑和运营经理等角色包。运行时只组合所确认的文档包和三份角色包；不会因 token 优化跳过任何角色。
 
+### 数据来源与参考实现
+
+内置文档包和角色包基于日常技术、产品、运营、内容创作及叙事写作场景进行人工归纳；角色分工、任务拆解和上下文约束的设计参考了 [ECC（Everything Claude Code）](https://github.com/affaan-m/ECC) 项目的公开实现。该参考用于提炼可组合角色与工作流设计方法，并非运行时依赖，也不会自动同步或复制 ECC 的内容。每个 pack 的具体结构、提问字段和质量检查均由本项目结合 writing-workshop 的三角色 `write → review → check` 流程重新组织；实际文档中的事实、数据和引用仍必须来自用户提供或本次任务明确登记的来源。
+
 开始 writer 前，用户必须确认文档包、风格/渠道和三个角色。初始化脚本会在未确认时创建 `awaiting_intake_confirmation` 状态，随后使用 `route_intake.py` 生成问题，由宿主呈现并用 `confirm_intake.py` 恢复。直接确认初始化的示例：
 
 ```bash
