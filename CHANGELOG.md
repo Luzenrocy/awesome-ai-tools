@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.1 — 2026-11-16
+
+- Bumped the Codex plugin manifest version so Codex clients can discover the
+  writing-workshop update.
+
 ## 1.1.0 — 2026-11-16
 
 - Added built-in document and role prompt packs for common technical, product,
