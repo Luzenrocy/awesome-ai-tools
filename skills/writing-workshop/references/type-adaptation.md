@@ -1,6 +1,6 @@
 # Adaptive document contracts
 
-Document type is an input to the contract, not a fixed list of allowed outputs. Use the smallest contract that serves the reader and the requested channel.
+Document type is an input to the contract, not a fixed list of allowed outputs. Use the smallest contract that serves the reader and the requested channel. A known type should resolve to a selected document pack in `prompt-packs/documents.yaml`; an unknown type remains `custom` until the user confirms a compact custom contract.
 
 ## Contract fields
 
@@ -12,7 +12,7 @@ it does not duplicate the field definitions.
 
 Infer a family from purpose, reader job, audience, medium, risk, and evidence level. A learning note may need concepts, questions, examples, and review prompts; a blog may need a thesis, narrative flow, evidence, and a call to action; an RFC may need alternatives, decisions, and operational impact. These are examples only. User-provided headings or templates take precedence.
 
-If the genre is unclear, use `custom` and invoke at most one native structured question for the blocking choice. Store the answer or assumption in the ledger. Never add engineering sections merely because they are present in a known template.
+Before drafting, present the recommended type/pack, channel/style, and role trio to the user for confirmation. If the genre is unclear, use `custom` and invoke at most one native structured question for the blocking choice. Store the answer or assumption in the ledger and `intake-confirmation.yaml`. Never add engineering sections merely because they are present in a known template.
 
 ## Quality checks by family
 

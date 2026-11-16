@@ -1,6 +1,6 @@
 # Dynamic role profiles and routing
 
-The three process roles are stable; their domain lens is adaptive. A role title is not limited to a fixed list of professions. Infer a useful lens from the reader job, domain, risk, evidence level, medium, and the user's explicit identity request.
+The three process roles are stable; their domain lens is adaptive. A role title is not limited to a fixed list of professions. Infer a useful lens from the reader job, domain, risk, evidence level, medium, and the user's explicit identity request. Resolve that lens to a selected built-in role pack in `prompt-packs/roles.yaml`, or to a user-defined role pack when the user explicitly chooses one.
 
 ## Routing inputs
 
@@ -19,7 +19,14 @@ roles:
     rationale: "..."
 ```
 
-Useful lenses include product, domain SME, engineer, architect, educator, technical writer, editor, researcher, operations, security, accessibility, novice reader, or an explicit user-defined identity. Combine lenses when the artifact requires it. User-specified roles take precedence.
+Useful lenses include product, domain SME, engineer, architect, educator, technical writer, editor, researcher, operations, security, accessibility, novice reader, or an explicit user-defined identity. Combine lenses when the artifact requires it. User-specified roles take precedence. Record the selected `role_pack_id`, version/hash, and whether a matching local fragment was active.
+
+## Pack composition
+
+A role pack contributes only a short domain lens: `writer_fragment`,
+`review_delta`, and `check_delta`. A document pack supplies the structure and
+content form. Never turn every document type into a new agent; compose the
+same three stable process roles with the selected document and role packs.
 
 ## Process responsibilities
 
@@ -34,8 +41,9 @@ Useful lenses include product, domain SME, engineer, architect, educator, techni
 When collaboration tools are available, create one subagent per role and pass a narrow prompt:
 
 ```text
-You are the {role} for round {N}, iteration {I}. Read only these files: {paths}.
-The immutable user brief and normalized ledger are the current constraints.
+You are the {role} for round {N}, iteration {I}. Read `role-inputs/{role}.json`
+first, then read only the artifacts allow-listed there. The immutable user brief
+and normalized ledger are the current constraints.
 Do not infer facts not present in the files. Write your result to {output-path}.
 Return concise evidence and decisions; omit hidden reasoning and role debate.
 ```

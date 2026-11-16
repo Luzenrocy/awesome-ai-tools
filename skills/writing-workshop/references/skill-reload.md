@@ -4,9 +4,9 @@ Skill instructions are mutable local configuration. A run must use the files tha
 
 ## Snapshot
 
-At invocation start, enumerate `SKILL.md`, `agents/openai.yaml`, every
-reference explicitly loaded for the request, and every helper script used for
-the run. Store:
+At invocation start, enumerate `SKILL.md`, `agents/openai.yaml`, every selected
+reference, selected built-in prompt-pack file, active local fragment, and every
+helper script used for the run. Store:
 
 ```yaml
 skill_snapshot:
@@ -17,9 +17,9 @@ skill_snapshot:
       modified: "ISO-8601 timestamp"
 ```
 
-`scripts/fingerprint_skill.py` can produce the file list and hashes for the
-skill's references and scripts. Do not hash or load unrelated secrets or
-project content.
+`scripts/fingerprint_skill.py` snapshots only its explicit `--include` files by
+default; use `--all-support-files` only for a maintenance audit. Do not hash or
+load unrelated packs, secrets, or project content.
 
 ## Before each role, iteration, and round
 

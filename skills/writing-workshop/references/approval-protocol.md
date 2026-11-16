@@ -3,28 +3,30 @@
 ## State machine
 
 ```text
-intake -> drafting -> reviewing -> revising -> approval/checker
-                                      |               |
-                                      +--revise-------+ (same round, budget remains)
-                                                      |
-                         budget exhausted + findings |
-                                                      v
-                                           round-summary -> user decision
-                                           continue -> next round
-                                           stop -----> unresolved
-checker --blocked--> blocked
-checker --approve--> published
+intake confirmation -> writer -> reviewer -> checker
+                                           |          |
+                                           |          +--approve--> published
+                                           |          +--blocked--> blocked
+                                           |
+                                           +--review finding or revise-->
+                                              next iteration writer
+
+iteration budget exhausted + unresolved findings
+  -> round-summary -> user decision -> continue: next round / stop: unresolved
 ```
 
-`round` starts at 1. Each round has an `iterations_per_round` budget, which
-defaults to 10 to preserve the current default iteration count. An iteration is
-one writer/reviewer/checker cycle. A `revise` decision consumes one iteration
-and stays in the current round while budget remains. After the final iteration,
-any remaining findings are summarized in `round-summary.md`, and the user is
-asked whether to begin the next round. Only an explicit “continue” answer may
-increment `round`; “stop” writes `unresolved.md` and ends the run. A `blocked`
-decision stops immediately. The configured `round_limit` remains the hard
-upper bound for user-approved rounds.
+Before round 1, the user confirms the document pack/type, style/channel, and
+writer/reviewer/checker roles. `round` starts at 1. Each round has an
+`iterations_per_round` budget, which defaults to 10. An iteration is exactly
+one writer/reviewer/checker cycle, and the checker always runs even when the
+reviewer reports findings. A reviewer finding or checker `revise` consumes the
+iteration and makes the next numbered iteration's writer responsible for the
+revision. After the final iteration, any remaining findings are summarized in
+`round-summary.md`, and the user is asked whether to begin the next round. Only
+an explicit “continue” answer may increment `round`; “stop” writes
+`unresolved.md` and ends the run. `blocked` is reserved for a missing fact,
+user decision, permission, rule conflict, or external contract. The configured
+`round_limit` remains the hard upper bound for user-approved rounds.
 
 ## Checker/approver gate
 

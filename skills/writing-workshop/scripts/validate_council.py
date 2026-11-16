@@ -152,6 +152,41 @@ def main() -> int:
         if not (council / name).is_file():
             errors.append(f"missing {name}")
 
+    intake_confirmed = nested_scalar(manifest, "intake", "confirmed")
+    protocol_version = scalar(manifest, "workflow_protocol_version")
+    is_v2 = protocol_version == "2"
+    if protocol_version is not None and not is_v2:
+        errors.append(f"unsupported workflow_protocol_version: {protocol_version!r}")
+    if "intake:" in manifest and not (council / "intake-confirmation.yaml").is_file():
+        errors.append("missing intake-confirmation.yaml")
+    if intake_confirmed is not None and intake_confirmed not in {"true", "false"}:
+        errors.append("intake.confirmed must be true or false")
+    if status in {"drafting", "reviewing", "revising", "approval", "published"} and intake_confirmed == "false":
+        errors.append("drafting or later status requires intake.confirmed: true")
+    if intake_confirmed == "true" and "pending-confirmation" in manifest:
+        errors.append("confirmed intake cannot retain pending-confirmation role packs")
+    if intake_confirmed == "true" and nested_scalar(manifest, "intake", "style_or_channel") in {None, "[TBD]"}:
+        errors.append("confirmed intake requires a style_or_channel")
+    confirmation_path = council / "intake-confirmation.yaml"
+    confirmation = confirmation_path.read_text(encoding="utf-8") if confirmation_path.is_file() else ""
+    if is_v2 and intake_confirmed == "true":
+        source = nested_scalar(confirmation, "intake_confirmation", "user_confirmation_source")
+        answered_at = nested_scalar(confirmation, "intake_confirmation", "answered_at")
+        if source in {None, "pending", "[TBD]"}:
+            errors.append("confirmed v2 intake requires a recorded user_confirmation_source")
+        if answered_at in {None, "pending", "[TBD]"}:
+            errors.append("confirmed v2 intake requires answered_at")
+        if (council / "pending-user-input.json").exists():
+            errors.append("confirmed v2 intake cannot retain pending-user-input.json")
+        brief = (council / "user-brief.md").read_text(encoding="utf-8") if (council / "user-brief.md").is_file() else ""
+        if "Paste the user's original request here verbatim." in brief:
+            errors.append("confirmed v2 intake requires the verbatim user brief, not the initializer placeholder")
+    if is_v2 and status == "awaiting_intake_confirmation":
+        if intake_confirmed != "false":
+            errors.append("awaiting v2 intake requires intake.confirmed: false")
+        if not (council / "pending-user-input.json").is_file():
+            errors.append("awaiting v2 intake requires pending-user-input.json")
+
     target_path = nested_scalar(manifest, "publication", "target_path")
     path_source = nested_scalar(manifest, "publication", "target_path_source")
     if not target_path:
@@ -188,6 +223,8 @@ def main() -> int:
             hard_ids.append(entry_id.group(1))
 
     rounds_dir = council / "rounds"
+    if is_v2 and status == "awaiting_intake_confirmation" and rounds_dir.exists():
+        errors.append("awaiting v2 intake must not create rounds before user confirmation")
     if rounds_dir.is_dir():
         for path in sorted(rounds_dir.iterdir()):
             if not path.is_dir():
@@ -221,7 +258,7 @@ def main() -> int:
                     label = f"{path.name}/{iteration_path.name}"
                     require_files(iteration_path, ITERATION_FILENAMES, errors, label)
                     validate_coverage(iteration_path, hard_ids, errors, label)
-    else:
+    elif not (is_v2 and status == "awaiting_intake_confirmation"):
         errors.append("missing rounds/")
     publish = council / "publish.md"
     if publish.exists() and status != "published":

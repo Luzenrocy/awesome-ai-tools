@@ -33,6 +33,9 @@ corresponding iteration directory.
 {process-path}/
 ├── manifest.yaml                    # state, counters, roles, target, and resolved paths
 ├── intake.md                         # human-readable initialization summary
+├── intake-confirmation.yaml          # confirmed document pack, style/channel, and role trio
+├── pending-user-input.json            # exists only while waiting for host/user answer
+├── intake-decision.json               # routed options plus recorded confirmation after resume
 ├── user-brief.md                     # immutable request and dated amendments
 ├── requirements-ledger.yaml          # U-* requirements, constraints, and acceptance checks
 ├── adaptive-contract.yaml            # effective document type, structure, and quality checks
@@ -45,14 +48,15 @@ corresponding iteration directory.
 │   └── round-01/                    # one user-approved batch
 │       ├── iterations/
 │       │   └── iteration-01/        # one writer → reviewer → checker cycle
+│       │       ├── role-inputs/      # per-role least-privilege allow-list packets
 │       │       ├── draft.md         # writer output
 │       │       ├── review.md        # reviewer findings and evidence
 │       │       ├── revision.md      # finding-to-change map
 │       │       ├── decision.md      # checker approve/revise/blocked verdict
 │       │       ├── coverage.yaml    # requirement-to-draft evidence map
 │       │       └── input-snapshot.yaml # role input rule/contract snapshot
-│       ├── {draft,review,revision,decision}.md # latest iteration indexes
-│       ├── {coverage,input-snapshot}.yaml      # latest iteration indexes
+│       ├── {draft,review,revision,decision}.md # lightweight latest iteration indexes
+│       ├── {coverage,input-snapshot}.yaml      # lightweight latest iteration indexes
 │       ├── round-summary.md         # remaining findings at the round gate
 │       └── user-decision.md         # explicit continue/stop decision
 ├── publish.md                       # publication evidence after approval
@@ -63,10 +67,11 @@ corresponding iteration directory.
 ## Round and iteration records
 
 The manifest starts at `current_round: 1` and uses the current default
-`iterations_per_round: 10`. An iteration is one writer/reviewer/checker cycle;
-a round is the batch containing up to that many iterations. A `revise` decision
-continues the current round while its iteration budget remains. The skill never
-starts another round by itself. After the final iteration, if findings remain,
+`iterations_per_round: 10`. An iteration is one complete writer/reviewer/checker
+cycle; a round is the batch containing up to that many iterations. A reviewer
+finding or checker `revise` starts the next numbered iteration in the current
+round while its iteration budget remains. The skill never starts another round
+by itself. After the final iteration, if findings remain,
 write the remaining-finding summary and ask the user whether to start the next
 round. Record the answer before advancing or stopping. A `blocked` decision
 stops immediately without asking this continuation question. `round_limit`
@@ -82,6 +87,9 @@ responsibility map; `round-NN` and `iteration-MM` are zero-padded numbers.
 | --- | --- | --- |
 | Run metadata | `manifest.yaml` | Machine-readable state, counters, role routing, publication target, process-base path, dedicated council path, and path provenance. It is the authoritative run index. |
 | Run metadata | `intake.md` | Human-readable startup summary copied from initialization arguments; useful for quickly understanding the run without parsing YAML. |
+| Run metadata | `intake-confirmation.yaml` | User-confirmed document pack/type, style/channel, writer/reviewer/checker role packs, and confirmation source. Drafting is prohibited until this record says `confirmed: true`. |
+| Intake gate | `pending-user-input.json` | Portable host-question payload containing ranked document/role recommendations and the unanswered questions. It exists only before confirmation. |
+| Intake gate | `intake-decision.json` | Archived routing payload annotated with confirmation time and host source. |
 | User intake | `user-brief.md` | Immutable verbatim user request plus dated amendments. Never replace the original with a summary. |
 | Requirements | `requirements-ledger.yaml` | Normalized `U-*` requirements, must/must-not constraints, acceptance checks, open questions, and user decisions. |
 | Contract | `adaptive-contract.yaml` | Effective document type, audience, purpose, structure, terminology, output format, and quality checks for this run. |
@@ -96,7 +104,8 @@ responsibility map; `round-NN` and `iteration-MM` are zero-padded numbers.
 | Iteration decision | `rounds/round-NN/iterations/iteration-MM/decision.md` | Checker/approver verdict (`approve`, `revise`, or `blocked`) and itemized dispositions. |
 | Iteration coverage | `rounds/round-NN/iterations/iteration-MM/coverage.yaml` | Requirement ID to draft location/evidence mapping for the iteration. |
 | Iteration inputs | `rounds/round-NN/iterations/iteration-MM/input-snapshot.yaml` | Exact rule, ledger, and contract snapshot identifiers supplied to the role calls. |
-| Current-round index | `rounds/round-NN/{draft,review,revision,decision}.md` | Copy/index of the latest iteration's corresponding record for quick access; historical evidence remains under `iterations/`. |
+| Iteration inputs | `rounds/round-NN/iterations/iteration-MM/role-inputs/{writer,reviewer,checker}.json` | Exact role allow-list, selected document/role pack payloads, matching active local fragments, hashes, selected source rows, output path, and any full-context exception reason. |
+| Current-round index | `rounds/round-NN/{draft,review,revision,decision}.md` | Lightweight pointer/index to the latest iteration's corresponding record; historical evidence remains under `iterations/`. |
 | Current-round index | `rounds/round-NN/{coverage,input-snapshot}.yaml` | Latest coverage and input snapshot index for the round; never delete or rewrite earlier iteration files. |
 | Round gate | `rounds/round-NN/round-summary.md` | At the end of a batch, summarizes remaining reviewer/checker findings and why they are still open. |
 | Round gate | `rounds/round-NN/user-decision.md` | Records the user's explicit continue/stop decision after the round budget; no next round may start without it. |
@@ -105,6 +114,7 @@ responsibility map; `round-NN` and `iteration-MM` are zero-padded numbers.
 | Blocker | `unresolved.md` | Remaining blockers when checker blocks, the user stops, or the configured round limit is reached. Do not create it for a successful approval. |
 
 Do not merge review findings into progress or memory, and do not use a generic
-`notes.md` when one of the typed records above applies. Every role reads the
-current typed records named in its input snapshot.
+`notes.md` when one of the typed records above applies. Every role reads only
+the current typed records named in its own `role-inputs/{role}.json`; the
+input snapshot is an index, not a permission to read the entire council.
 

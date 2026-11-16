@@ -8,6 +8,8 @@ This reference describes how to build a contract for the requested artifact. It 
 document_contract:
   mode: known | custom | hybrid
   family: normative | explanatory | instructional | reference | narrative | editorial | learning | record | custom
+  document_packs: ["built-in or custom pack IDs"]
+  role_packs: {writer: "...", reviewer: "...", checker: "..."}
   label: "user-facing document name"
   purpose: "what this artifact must accomplish"
   reader_job: "what the reader should be able to do or understand"

@@ -1,0 +1,9 @@
+schema_version: 1
+catalogues:
+  documents: documents.yaml
+  roles: roles.yaml
+local_override:
+  default_relative_path: writing-workshop-local/prompt-fragments
+  precedence: after-built-in-before-inference
+  allowed_statuses: [active]
+  forbidden_overrides: [core-workflow, safety, user-brief]

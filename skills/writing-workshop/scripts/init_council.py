@@ -10,14 +10,17 @@ from datetime import date
 from pathlib import Path
 
 from council_schema import (
+    DEFAULT_DOCUMENT_PACK,
     DEFAULT_ITERATIONS_PER_ROUND,
     DEFAULT_PROCESS_DIRECTORY,
     MAX_ITERATIONS_PER_ROUND,
     MAX_ROUNDS,
+    PENDING_ROLE_PACK,
 )
 
 
 SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{0,63}$")
+PACK_ID_RE = re.compile(r"^  - id: ([a-z0-9][a-z0-9._-]+)$", re.MULTILINE)
 ITERATION_FILES = (
     ("draft.md", "Draft"),
     ("review.md", "Review findings"),
@@ -37,7 +40,7 @@ def write_iteration_artifacts(output_dir: Path, round_number: int, iteration_num
 
     (output_dir / "coverage.yaml").write_text("ledger_version: 1\nentries: []\n", encoding="utf-8")
     (output_dir / "input-snapshot.yaml").write_text(
-        'rules_snapshot: "[TBD]"\nledger_version: 1\ncontract_snapshot: "[TBD]"\n',
+        'rules_snapshot: "[TBD]"\nledger_version: 1\ncontract_snapshot: "[TBD]"\nprompt_packs: "[TBD]"\n',
         encoding="utf-8",
     )
     for name, heading in ITERATION_FILES:
@@ -68,13 +71,44 @@ def resolve_process_path(target: Path) -> Path:
     return resolve_target_directory(target) / DEFAULT_PROCESS_DIRECTORY
 
 
+def builtin_pack_ids(filename: str) -> set[str]:
+    """Return lightweight catalogue IDs without adding a YAML dependency."""
+
+    catalogue = Path(__file__).resolve().parents[1] / "prompt-packs" / filename
+    if not catalogue.is_file():
+        return set()
+    return set(PACK_ID_RE.findall(catalogue.read_text(encoding="utf-8")))
+
+
+def check_pack(value: str, known: set[str], argument: str, parser: argparse.ArgumentParser) -> None:
+    if value == "custom" or value in known:
+        return
+    parser.error(f"{argument} must be custom or a built-in prompt-pack ID")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", help="explicit artifact root; otherwise use the target file's parent directory")
     parser.add_argument("--council-path", help="exact process-artifact directory; overrides --root")
     parser.add_argument("--document-slug", required=True)
     parser.add_argument("--title", required=True)
+    parser.add_argument("--user-brief", help="verbatim user request; required for direct confirmed initialization")
     parser.add_argument("--type", dest="doc_type", default="custom")
+    parser.add_argument("--document-pack", default=DEFAULT_DOCUMENT_PACK)
+    parser.add_argument("--style-or-channel", default="[TBD]")
+    parser.add_argument("--writer-role", default=PENDING_ROLE_PACK)
+    parser.add_argument("--reviewer-role", default=PENDING_ROLE_PACK)
+    parser.add_argument("--checker-role", default=PENDING_ROLE_PACK)
+    parser.add_argument(
+        "--intake-confirmed",
+        action="store_true",
+        help="mark the user-selected document pack, style, and role trio as confirmed",
+    )
+    parser.add_argument(
+        "--confirmation-source",
+        choices=("codex-structured-question", "claude-ask-user-question", "cli-resume", "explicit-user-message"),
+        help="host mechanism through which the user confirmed the intake choices",
+    )
     parser.add_argument("--contract-mode", choices=("known", "custom", "hybrid"), default="custom")
     parser.add_argument("--family", default="custom")
     parser.add_argument("--purpose", default="[TBD]")
@@ -111,6 +145,22 @@ def main() -> int:
         parser.error(f"--round-limit must be between 1 and {MAX_ROUNDS}")
     if not 1 <= args.iterations_per_round <= MAX_ITERATIONS_PER_ROUND:
         parser.error(f"--iterations-per-round must be between 1 and {MAX_ITERATIONS_PER_ROUND}")
+    document_pack_ids = builtin_pack_ids("documents.yaml")
+    role_pack_ids = builtin_pack_ids("roles.yaml")
+    check_pack(args.document_pack, document_pack_ids, "--document-pack", parser)
+    if args.intake_confirmed:
+        if not args.confirmation_source:
+            parser.error("--intake-confirmed requires --confirmation-source")
+        if not args.user_brief:
+            parser.error("--intake-confirmed requires --user-brief")
+        if args.style_or_channel == "[TBD]":
+            parser.error("--intake-confirmed requires --style-or-channel")
+        for value, argument in (
+            (args.writer_role, "--writer-role"),
+            (args.reviewer_role, "--reviewer-role"),
+            (args.checker_role, "--checker-role"),
+        ):
+            check_pack(value, role_pack_ids, argument, parser)
 
     target = Path(args.target_path).expanduser()
     if args.council_path:
@@ -132,12 +182,11 @@ def main() -> int:
     process_base_path = process_base_path.resolve()
     council.mkdir(parents=True, exist_ok=True)
     round_dir = council / "rounds" / "round-01"
-    round_dir.mkdir(parents=True, exist_ok=True)
     iteration_dir = round_dir / "iterations" / "iteration-01"
-    iteration_dir.mkdir(parents=True, exist_ok=True)
 
     today = date.today().isoformat()
     integration_mode = "none" if args.target_skill == "none" else "optional-overlay"
+    intake_status = "drafting" if args.intake_confirmed else "awaiting_intake_confirmation"
     manifest = "\n".join(
         [
             f"document_id: {yaml_quote(args.document_slug)}",
@@ -148,16 +197,28 @@ def main() -> int:
             f"created: {today}",
             f"updated: {today}",
             "version: \"0.1\"",
-            "status: drafting",
+            "workflow_protocol_version: 2",
+            f"status: {intake_status}",
             f"round_limit: {args.round_limit}",
             f"iterations_per_round: {args.iterations_per_round}",
             "current_round: 1",
-            "current_iteration: 0",
+            f"current_iteration: {1 if args.intake_confirmed else 0}",
             "round_gate: none",
+            "intake:",
+            f"  confirmed: {str(args.intake_confirmed).lower()}",
+            "  required_fields: [document_pack, style_or_channel, writer_role, reviewer_role, checker_role]",
+            f"  style_or_channel: {yaml_quote(args.style_or_channel)}",
+            "prompt_packs:",
+            f"  document_pack: {yaml_quote(args.document_pack)}",
+            "  role_packs:",
+            f"    writer: {yaml_quote(args.writer_role)}",
+            f"    reviewer: {yaml_quote(args.reviewer_role)}",
+            f"    checker: {yaml_quote(args.checker_role)}",
+            "  local_fragments: []",
             "roles:",
-            "  writer: pending-profile",
-            "  reviewer: pending-profile",
-            "  approver: pending-profile",
+            f"  writer: {yaml_quote(args.writer_role)}",
+            f"  reviewer: {yaml_quote(args.reviewer_role)}",
+            f"  approver: {yaml_quote(args.checker_role)}",
             "document_contract:",
             f"  mode: {args.contract_mode}",
             f"  family: {yaml_quote(args.family)}",
@@ -191,13 +252,24 @@ def main() -> int:
     )
     (council / "manifest.yaml").write_text(manifest, encoding="utf-8")
     (council / "intake.md").write_text(
-        f"# Intake: {args.title}\n\n- Document type: `{args.doc_type}`\n- Contract mode: `{args.contract_mode}`\n- Family: `{args.family}`\n- Audience: `{args.audience}`\n- Purpose: {args.purpose}\n- Target path: `{args.target_path}`\n- Process path: `{council}` ({process_path_resolution})\n- Target format: `{args.target_format}`\n- Integration mode: `{integration_mode}`\n",
+        f"# Intake: {args.title}\n\n- Document type: `{args.doc_type}`\n- Recommended document pack: `{args.document_pack}`\n- Style/channel: `{args.style_or_channel}`\n- Contract mode: `{args.contract_mode}`\n- Family: `{args.family}`\n- Audience: `{args.audience}`\n- Purpose: {args.purpose}\n- Writer role: `{args.writer_role}`\n- Reviewer role: `{args.reviewer_role}`\n- Checker role: `{args.checker_role}`\n- Intake confirmed: `{args.intake_confirmed}`\n- Target path: `{args.target_path}`\n- Process path: `{council}` ({process_path_resolution})\n- Target format: `{args.target_format}`\n- Integration mode: `{integration_mode}`\n",
         encoding="utf-8",
     )
-    (council / "user-brief.md").write_text(
-        "# User brief\n\nPaste the user's original request here verbatim. Add dated amendments below it; do not replace the original text.\n",
+    (council / "intake-confirmation.yaml").write_text(
+        "intake_confirmation:\n"
+        f"  confirmed: {str(args.intake_confirmed).lower()}\n"
+        f"  document_pack: {yaml_quote(args.document_pack)}\n"
+        f"  style_or_channel: {yaml_quote(args.style_or_channel)}\n"
+        "  roles:\n"
+        f"    writer: {yaml_quote(args.writer_role)}\n"
+        f"    reviewer: {yaml_quote(args.reviewer_role)}\n"
+        f"    checker: {yaml_quote(args.checker_role)}\n"
+        f"  user_confirmation_source: {yaml_quote(args.confirmation_source or 'pending')}\n"
+        f"  answered_at: {yaml_quote(today if args.intake_confirmed else 'pending')}\n",
         encoding="utf-8",
     )
+    user_brief = args.user_brief or "Paste the user's original request here verbatim. Add dated amendments below it; do not replace the original text."
+    (council / "user-brief.md").write_text("# User brief\n\n" + user_brief.rstrip() + "\n", encoding="utf-8")
     (council / "requirements-ledger.yaml").write_text(
         "version: 1\nsource_message: \"[TBD]\"\nentries: []\namendments: []\n",
         encoding="utf-8",
@@ -226,10 +298,24 @@ def main() -> int:
         "Record only durable decisions, terminology, constraints, assumptions, unresolved items, and links to typed process records.\n",
         encoding="utf-8",
     )
-    for output_dir in (round_dir, iteration_dir):
-        write_iteration_artifacts(output_dir, round_number=1, iteration_number=1)
-    (round_dir / "round-summary.md").write_text("# Remaining findings summary: round 01\n\n[TBD]\n", encoding="utf-8")
-    (round_dir / "user-decision.md").write_text("# User continuation decision: round 01\n\n[TBD]\n", encoding="utf-8")
+    if args.intake_confirmed:
+        for output_dir in (round_dir, iteration_dir):
+            output_dir.mkdir(parents=True, exist_ok=True)
+            write_iteration_artifacts(output_dir, round_number=1, iteration_number=1)
+        (round_dir / "round-summary.md").write_text("# Remaining findings summary: round 01\n\n[TBD]\n", encoding="utf-8")
+        (round_dir / "user-decision.md").write_text("# User continuation decision: round 01\n\n[TBD]\n", encoding="utf-8")
+    else:
+        pending = {
+            "schema_version": 1,
+            "status": "awaiting_intake_confirmation",
+            "document_candidates": [],
+            "role_combination_candidates": [],
+            "questions": [],
+            "next_action": "Run route_intake.py, ask the displayed questions with the host adapter, then run confirm_intake.py.",
+        }
+        (council / "pending-user-input.json").write_text(
+            json.dumps(pending, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
     print(council)
     return 0
 

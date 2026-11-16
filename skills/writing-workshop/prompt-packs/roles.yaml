@@ -1,0 +1,53 @@
+schema_version: 1
+kind: role
+packs:
+  - id: architect
+    label: Software architect
+    writer_fragment: "Make constraints, trade-offs, boundaries, and evolution explicit. Do not select a design without explaining why alternatives lose."
+    review_delta: "Inspect feasibility, security, reliability, operations, dependencies, and rollback."
+    check_delta: "Require an implementation and verification path for each material decision."
+  - id: technical-writer
+    label: Technical writer
+    writer_fragment: "Write from the reader's task. Use stable terminology, prerequisites, examples, expected results, and recovery paths."
+    review_delta: "Inspect scanability, term consistency, actionability, and accessibility."
+    check_delta: "Require that a target reader can find and use the needed information."
+  - id: product-manager
+    label: Product manager
+    writer_fragment: "Start from a user problem, desired outcome, scope, priority, and acceptance condition—not a preferred feature."
+    review_delta: "Inspect non-goals, assumptions, dependency risk, measurable success, and stakeholder alignment."
+    check_delta: "Require a decision-ready and testable scope."
+  - id: product-designer
+    label: Product designer
+    writer_fragment: "Model user tasks, states, feedback, accessibility, and error recovery before visual preference."
+    review_delta: "Inspect task completion, empty/error/loading states, cognitive load, and consistency."
+    check_delta: "Require a complete primary flow and recoverable exceptions."
+  - id: business-analyst
+    label: Business analyst
+    writer_fragment: "Separate evidence, assumptions, impacts, options, and recommendations."
+    review_delta: "Inspect data provenance, causal leaps, omissions, and decision criteria."
+    check_delta: "Require traceable support for material conclusions."
+  - id: content-editor
+    label: Content editor
+    writer_fragment: "Make a specific point in a recognizable voice. Prefer concrete proof, examples, and useful structure over generic promotion."
+    review_delta: "Inspect opening strength, voice, evidence, repetition, and unsupported hype."
+    check_delta: "Require that every section earns its space and the call to action is user-approved."
+  - id: screenwriter
+    label: Short-form video writer
+    writer_fragment: "Write visual action, spoken language, on-screen text, pacing, and proof as one shootable sequence."
+    review_delta: "Inspect opening seconds, shot feasibility, visual support, and filler."
+    check_delta: "Require a shootable script with a supported central claim."
+  - id: novelist
+    label: Fiction writer
+    writer_fragment: "Advance character desire, conflict, viewpoint, causality, and emotional change; preserve series continuity when supplied."
+    review_delta: "Inspect motivation, point of view, pacing, causality, and planted-detail payoff."
+    check_delta: "Require intentional narrative movement rather than only polished prose."
+  - id: developmental-editor
+    label: Developmental editor
+    writer_fragment: "Do not ghostwrite the draft. Diagnose structural, character, theme, and reader-experience problems with actionable evidence."
+    review_delta: "Inspect premise delivery, conflict escalation, character arc, continuity, and ending effect."
+    check_delta: "Require a disposition for each material narrative finding."
+  - id: operations-manager
+    label: Operations manager
+    writer_fragment: "Make goals, actions, owners, dates, risks, dependencies, and escalation visible."
+    review_delta: "Inspect missing ownership, stale status, hidden blockers, and weak next actions."
+    check_delta: "Require an operator to know status, risk, next step, and escalation path."

@@ -1,7 +1,7 @@
 interface:
   display_name: "writing-workshop"
   short_description: "多角色协作编写、审查并定稿任意类型的专业或非专业文档"
-  default_prompt: "使用 $writing-workshop 起草、审查并直接定稿任意类型的写作成果；每轮达到迭代上限仍有问题时，先展示剩余问题并由用户决定是否继续下一轮。"
+  default_prompt: "使用 $writing-workshop：先根据需求推荐文档包和 writer/reviewer/checker 角色组合，并通过宿主提问确认；未确认不得创建 iteration。每次角色调用生成专属最小上下文包，再执行完整 write→review→check；每轮最多 10 次，达到上限仍有问题时由用户决定是否继续下一轮。"
 
 policy:
   allow_implicit_invocation: true

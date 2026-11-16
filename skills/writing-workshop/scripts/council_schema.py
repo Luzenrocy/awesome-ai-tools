@@ -9,6 +9,8 @@ MAX_ROUNDS = 10
 MAX_ITERATIONS_PER_ROUND = 10
 DEFAULT_ITERATIONS_PER_ROUND = 10
 DEFAULT_PROCESS_DIRECTORY = "council"
+DEFAULT_DOCUMENT_PACK = "custom"
+PENDING_ROLE_PACK = "pending-confirmation"
 ROUND_RE = re.compile(r"round-(\d+)$")
 ITERATION_RE = re.compile(r"iteration-(\d+)$")
 
@@ -26,6 +28,7 @@ ROUND_FILENAMES = ITERATION_FILENAMES + ROUND_GATE_FILENAMES
 ALLOWED_STATUS = frozenset(
     {
         "drafting",
+        "awaiting_intake_confirmation",
         "reviewing",
         "revising",
         "approval",

@@ -21,3 +21,9 @@ These sources are used as design inputs, not as copied templates. Follow a proje
 - [NASA ICON Project Requirements](https://explorers.larc.nasa.gov/2023ESE/pdf_files/4_ICON%20L2%20Project%20Requirements.pdf) and [Fermilab Functional Requirements Specification](https://beamdocs.fnal.gov/AD/DocDB/0070/007085/002/FRS-Booster%20Intensity-BD7085.pdf) are public examples of formal requirement-document organization and traceability.
 
 The council uses these sources to establish a professional baseline. It does not claim that any one source is a mandatory organizational standard; a project-specific contract always wins.
+
+## Prompt-pack design inputs
+
+- [ECC Content Engine](https://github.com/affaan-m/ECC/blob/main/skills/content-engine/SKILL.md) is a design input for keeping author voice separate from platform format, selecting one concrete claim per social output, and avoiding generic engagement padding. The local `content.*` packs adapt these principles for the supported channels; they are not copied platform-policy rules.
+- [ECC Article Writing](https://github.com/affaan-m/ECC/blob/main/skills/article-writing/SKILL.md) informs source-first, evidence-over-adjectives editorial fragments and the requirement that each section has a distinct job.
+- [ECC Cost-Aware LLM Pipeline](https://github.com/affaan-m/ECC/blob/main/skills/cost-aware-llm-pipeline/SKILL.md) and [Content-Hash Cache Pattern](https://github.com/affaan-m/ECC/blob/main/skills/content-hash-cache-pattern/SKILL.md) inform the selected-pack snapshot and hash-based reload approach. The council retains its fixed writer/reviewer/checker quality loop and does not route away a required role to save tokens.

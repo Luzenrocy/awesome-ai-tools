@@ -1,0 +1,123 @@
+schema_version: 1
+kind: document
+packs:
+  - id: technical.architecture
+    label: Architecture design / RFC
+    family: normative
+    intake_fields: [reader, decision, constraints, systems, risks]
+    required_sections: [context, goals-and-non-goals, alternatives, chosen-design, interfaces-and-data, risks, rollout-and-rollback, open-questions]
+    writer_fragment: "Explain the decision and its trade-offs. Include only architecture views needed to implement, operate, and reverse the decision."
+    review_delta: "Challenge unstated constraints, rejected alternatives, security or reliability gaps, and the absence of a rollback path."
+    check_delta: "Approve only when each important decision has a rationale, owner or assumption, and a verification path."
+  - id: technical.api-doc
+    label: API / SDK documentation
+    family: reference
+    intake_fields: [reader-skill, version, authentication, examples]
+    required_sections: [purpose, prerequisites, authentication, endpoints-or-api, requests-and-responses, errors, examples, compatibility]
+    writer_fragment: "Write for a caller completing a task; use runnable, internally consistent examples and state failure behavior."
+    review_delta: "Check prerequisites, parameter semantics, error cases, example consistency, and version compatibility."
+    check_delta: "Approve only when a reader can identify the next action, expected result, and recovery path."
+  - id: technical.runbook
+    label: Runbook / operational procedure
+    family: instructional
+    intake_fields: [operator, permissions, trigger, environment, escalation]
+    required_sections: [outcome, prerequisites, trigger, ordered-steps, verification, failure-paths, rollback, escalation]
+    writer_fragment: "Use ordered, observable actions. State where each action occurs before the action and include expected results."
+    review_delta: "Challenge missing permissions, unsafe steps, irreversible actions, verification, rollback, and escalation ownership."
+    check_delta: "Approve only when an authorized operator can execute and recover without guessing."
+  - id: technical.test-plan
+    label: Test plan / acceptance plan
+    family: normative
+    intake_fields: [scope, risks, environments, data, acceptance-owner]
+    required_sections: [scope, non-scope, risks, test-data, scenarios, boundaries, acceptance, exit-criteria]
+    writer_fragment: "Organize tests around risk and observable acceptance conditions, not a generic test checklist."
+    review_delta: "Challenge untestable requirements, unrepresented boundaries, missing negative cases, and unclear exit criteria."
+    check_delta: "Approve only when every material risk has a test, owner, and observable result."
+  - id: product.prd
+    label: Product requirements document
+    family: normative
+    intake_fields: [problem, users, goal, non-goals, success-metrics, constraints]
+    required_sections: [problem-and-context, goals-and-non-goals, users-and-scenarios, requirements, priority, acceptance, dependencies, risks, open-questions]
+    writer_fragment: "Define the user problem and intended outcome before features. Keep requirements singular, scoped, prioritized, and testable."
+    review_delta: "Challenge solution-first framing, missing non-goals, ambiguous user stories, unmeasurable success, and hidden dependencies."
+    check_delta: "Approve only when product, design, and engineering can make the same scope decision from the document."
+  - id: product.prototype-brief
+    label: Product prototype brief
+    family: explanatory
+    intake_fields: [user-task, platforms, entry-points, states, analytics]
+    required_sections: [user-task, flow, screens-or-states, interactions, empty-and-error-states, accessibility, analytics, acceptance]
+    writer_fragment: "Describe the user task and state transitions; distinguish visual preference from required interaction behavior."
+    review_delta: "Challenge missing entry, loading, empty, error, permission, and completion states."
+    check_delta: "Approve only when the primary task and recoverable failure paths are unambiguous."
+  - id: business.proposal
+    label: Business proposal / project initiation
+    family: record
+    intake_fields: [decision-maker, problem, options, investment, timing]
+    required_sections: [executive-summary, current-state, opportunity, options, recommendation, costs-and-benefits, risks, requested-decision]
+    writer_fragment: "Write for a decision-maker: separate evidence, assumptions, options, and the decision requested."
+    review_delta: "Challenge unsupported benefits, hidden costs, one-sided options, and an unclear requested decision."
+    check_delta: "Approve only when the decision-maker can act without inferring the ask."
+  - id: work.meeting-notes
+    label: Meeting notes / decision record
+    family: record
+    intake_fields: [participants, purpose, decisions, action-owners]
+    required_sections: [context, decisions, rationale, actions, owners, due-dates, open-questions]
+    writer_fragment: "Separate observations, decisions, and actions. Mark unknown owners or dates as TBD rather than inventing them."
+    review_delta: "Challenge implied decisions, action items without owners, and unresolved disagreements presented as consensus."
+    check_delta: "Approve only when follow-up is traceable to an owner and a decision or open question."
+  - id: work.status-report
+    label: Daily / weekly / monthly report
+    family: record
+    intake_fields: [period, goals, results, risks, next-period]
+    required_sections: [period-and-goals, progress, outcomes, risks-and-blockers, next-steps, asks]
+    writer_fragment: "Report changes and evidence, not activity volume. Use daily cadence for execution, weekly cadence for delivery, and monthly cadence for trends and learning."
+    review_delta: "Challenge vague progress, hidden blockers, metric without baseline, and next steps without ownership."
+    check_delta: "Approve only when the reader understands status, risk, and needed support."
+  - id: content.wechat-article
+    label: WeChat public-account article
+    family: editorial
+    intake_fields: [audience, claim, source-material, voice, call-to-action]
+    required_sections: [title, opening-hook, argument, examples-or-evidence, practical-takeaways, ending]
+    writer_fragment: "Lead with a concrete tension, artifact, or reader benefit. Give each section one job and use evidence instead of hype."
+    review_delta: "Challenge generic openings, repeated points, unsupported claims, imitation of a platform stereotype, and unearned calls to action."
+    check_delta: "Approve only when the article has a clear point, credible support, and a consistent voice."
+  - id: content.xiaohongshu
+    label: Xiaohongshu graphic post
+    family: editorial
+    intake_fields: [audience, use-case, visual-assets, claim, disclosure-needs]
+    required_sections: [who-it-is-for, benefit, scannable-steps-or-list, pitfalls, summary-or-saveable-checklist]
+    writer_fragment: "State who benefits and the concrete use case early. Make the body scannable and useful without inventing personal experience."
+    review_delta: "Challenge vague benefits, unverifiable experience, undisclosed assumptions, and lists with no actionable detail."
+    check_delta: "Approve only when a reader can save or act on a concrete takeaway."
+  - id: content.douyin-script
+    label: Douyin short-video script
+    family: editorial
+    intake_fields: [audience, duration, claim, visuals, proof, call-to-action]
+    required_sections: [opening-hook, shot-list, spoken-lines, on-screen-text, proof-or-demo, ending]
+    writer_fragment: "Show the result, problem, or tension in the opening seconds. Write for screen and sound, not for an essay page."
+    review_delta: "Challenge weak opening, narration without visual support, impossible shots, filler, and unearned engagement bait."
+    check_delta: "Approve only when the script is shootable and its central claim is supported or clearly framed as opinion."
+  - id: fiction.flash
+    label: Flash fiction / short story
+    family: narrative
+    intake_fields: [premise, viewpoint, character, conflict, ending-tone]
+    required_sections: [opening-image, desire-and-conflict, turn, ending]
+    writer_fragment: "Use a single change, conflict, or revelation. Let action and detail carry emotion rather than explanatory summary."
+    review_delta: "Challenge unclear motivation, viewpoint drift, unearned turns, and exposition that does not move the story."
+    check_delta: "Approve only when the story has coherent causality and an intentional emotional landing."
+  - id: fiction.web-novel
+    label: Serial / long-form web novel
+    family: narrative
+    intake_fields: [premise, world-rules, cast, chapter-goal, continuity-notes]
+    required_sections: [chapter-goal, scene-sequence, character-turn, continuity-notes, hook-or-payoff]
+    writer_fragment: "Track world rules, character motives, chapter goal, planted details, and payoff. Each chapter must advance plot, character, or reader expectation."
+    review_delta: "Challenge continuity breaks, static chapters, abandoned setups, and conflict resolved without consequence."
+    check_delta: "Approve only when the chapter is consistent with the series ledger and earns its hook or payoff."
+  - id: life.travel-plan
+    label: Travel / life plan
+    family: instructional
+    intake_fields: [dates, budget, travelers, preferences, constraints]
+    required_sections: [assumptions, itinerary, transport-and-bookings, budget, alternatives, risks-and-preparation]
+    writer_fragment: "Optimize for the user's stated constraints. Mark unknown availability, price, and policy as TBD rather than presenting them as facts."
+    review_delta: "Challenge unrealistic timing, missing reservations, budget gaps, accessibility needs, and lack of alternatives."
+    check_delta: "Approve only when the plan states assumptions and has a viable fallback for material risks."
